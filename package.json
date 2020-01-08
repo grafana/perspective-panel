@@ -1,0 +1,29 @@
+{
+  "name": "perspective-panel",
+  "version": "1.0.0",
+  "description": "Grafana Perspective Panel",
+  "scripts": {
+    "build": "grafana-toolkit plugin:build",
+    "test": "grafana-toolkit plugin:test",
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch"
+  },
+  "author": "Grafana Labs",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@finos/perspective-webpack-plugin": "0.4.1",
+    "@grafana/data": "next",
+    "@grafana/toolkit": "next",
+    "@types/react": "^16.9.19",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "jest-canvas-mock": "^2.2.0"
+  },
+  "dependencies": {
+    "@finos/perspective-viewer": "0.4.1",
+    "@finos/perspective-viewer-d3fc": "0.4.1",
+    "@finos/perspective-viewer-hypergrid": "0.4.1",
+    "@grafana/runtime": "next",
+    "@grafana/ui": "next"
+  }
+}
