@@ -1,0 +1,29 @@
+{
+  "type": "panel",
+  "name": "Perspective Panel",
+  "id": "perspective-panel",
+
+  "info": {
+    "description": "Grafana Panel with Perspective lib",
+    "author": {
+      "name": "Grafana Project"
+    },
+    "keywords": ["Perspective"],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {"name": "Website", "url": "https://github.com/grafana/perspective-panel"},
+      {"name": "License", "url": "https://github.com/grafana/perspective-panel/blob/master/LICENSE"}
+    ],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "6.6.x",
+    "plugins": []
+  }
+}
