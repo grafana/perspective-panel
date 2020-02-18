@@ -77,7 +77,7 @@ export class PerspectivePanel extends PureComponent<Props> {
 
         <perspective-viewer
           {...serializedOptions}
-          // @ts-ignore -- @todo remove when possible: https://github.com/finos/perspective/issues/865
+          // No, the following should not be `className` :)
           class={`perspective-viewer-material-dense${config.theme.isDark ? '-dark' : ''}`}
           ref={this.viewer}
           style={{

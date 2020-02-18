@@ -11,7 +11,7 @@ jest.mock('@finos/perspective-viewer', () => {});
 jest.mock('@finos/perspective-viewer-d3fc', () => {});
 jest.mock('@finos/perspective-viewer-hypergrid', () => {});
 
-/*jest.mock('@grafana/runtime', () => ({
+jest.mock('@grafana/runtime', () => ({
   config: {
     theme: {
       get isDark() {
@@ -19,7 +19,7 @@ jest.mock('@finos/perspective-viewer-hypergrid', () => {});
       },
     },
   },
-}));*/
+}));
 
 class PerspectivePanel extends PerspectivePanelOriginal {
   componentDidMount() {
@@ -46,7 +46,7 @@ const mockedData: PanelData = {
   ],
 };
 
-//let mockedIsDark;
+let mockedIsDark;
 
 const createPanel = config => {
   const { data, height, options, width } = {
@@ -62,8 +62,8 @@ const createPanel = config => {
 
 describe('PerspectivePanel', () => {
   beforeEach(() => {
-    Object.values(mockedViewer).forEach(method => method.mockReset());
-    //mockedIsDark = true;
+    Object.values(mockedViewer).forEach(method => method.mockClear());
+    mockedIsDark = true;
   });
 
   it('contains a custom element', () => {
@@ -71,19 +71,25 @@ describe('PerspectivePanel', () => {
     expect(viewers).toHaveLength(1);
   });
 
-  // @todo when possible: https://github.com/finos/perspective/issues/865
-  /*it('supports dark and light themes', () => {
+  it('supports a dark theme', () => {
     const wrapper = shallow(createPanel());
     const viewer = wrapper.find('perspective-viewer').first();
 
-    expect(viewer.hasClass('perspective-viewer-material-dense')).toBe(false);
-    expect(viewer.hasClass('perspective-viewer-material-dense-dark')).toBe(true);
+    // @todo use `hasClass` when possible: https://github.com/finos/perspective/issues/931
+    expect(viewer.matchesElement(<perspective-viewer class="perspective-viewer-material-dense" />)).toBe(false);
+    expect(viewer.matchesElement(<perspective-viewer class="perspective-viewer-material-dense-dark" />)).toBe(true);
+  });
 
+  it('supports a light theme', () => {
     mockedIsDark = false;
-    wrapper.update();
-    expect(viewer.hasClass('perspective-viewer-material-dense')).toBe(true);
-    expect(viewer.hasClass('perspective-viewer-material-dense-dark')).toBe(false);
-  });*/
+
+    const wrapper = shallow(createPanel());
+    const viewer = wrapper.find('perspective-viewer').first();
+
+    // @todo use `hasClass` when possible: https://github.com/finos/perspective/issues/931
+    expect(viewer.matchesElement(<perspective-viewer class="perspective-viewer-material-dense" />)).toBe(true);
+    expect(viewer.matchesElement(<perspective-viewer class="perspective-viewer-material-dense-dark" />)).toBe(false);
+  });
 
   it('passes data to the custom element upon initialization and when props change', () => {
     const { load } = mockedViewer;

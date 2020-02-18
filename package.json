@@ -20,9 +20,9 @@
     "jest-canvas-mock": "^2.2.0"
   },
   "dependencies": {
-    "@finos/perspective-viewer": "0.4.1",
-    "@finos/perspective-viewer-d3fc": "0.4.1",
-    "@finos/perspective-viewer-hypergrid": "0.4.1",
+    "@finos/perspective-viewer": "0.4.3",
+    "@finos/perspective-viewer-d3fc": "0.4.3",
+    "@finos/perspective-viewer-hypergrid": "0.4.3",
     "@grafana/runtime": "next",
     "@grafana/ui": "next"
   }
