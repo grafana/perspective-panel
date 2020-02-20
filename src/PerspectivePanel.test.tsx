@@ -1,11 +1,7 @@
-import { PanelData } from '@grafana/data';
+import { PanelData, toDataFrame } from '@grafana/data';
 import { PerspectivePanel as PerspectivePanelOriginal } from './PerspectivePanel';
 import { shallow } from 'enzyme';
 import React from 'react';
-
-jest.mock('./transformers', () => ({
-  toPerspectiveData: input => input,
-}));
 
 jest.mock('@finos/perspective-viewer', () => {});
 jest.mock('@finos/perspective-viewer-d3fc', () => {});
@@ -30,6 +26,7 @@ class PerspectivePanel extends PerspectivePanelOriginal {
 
 const mockedViewer = {
   addEventListener: jest.fn(),
+  delete: jest.fn().mockResolvedValue(true),
   load: jest.fn().mockResolvedValue(),
   notifyResize: jest.fn(),
   save: jest.fn().mockReturnValue({}),
@@ -41,8 +38,8 @@ const mockedWidth = 200;
 
 const mockedData: PanelData = {
   series: [
-    { name: 'AA', values: [0, 1, 2, 3] },
-    { name: 'BB', values: [4, 5, 6, 7] },
+    toDataFrame({ refId: 'AA', fields: [{ name: 'AA', values: [0, 1, 2, 3] }] }),
+    toDataFrame({ refId: 'BB', fields: [{ name: 'BB', values: [4, 5, 6, 7] }] }),
   ],
 };
 
@@ -92,13 +89,23 @@ describe('PerspectivePanel', () => {
   });
 
   it('passes data to the custom element upon initialization and when props change', () => {
-    const { load } = mockedViewer;
+    const { delete: deleteFn, load } = mockedViewer;
     const panel = shallow(createPanel());
 
     expect(load).toHaveBeenCalledTimes(1);
 
-    panel.setProps({ data: { series: [] } });
+    panel.setProps({
+      data: { ...mockedData } as PanelData,
+    });
     expect(load).toHaveBeenCalledTimes(2);
+
+    panel.setProps({
+      data: { series: [] } as PanelData,
+    });
+    expect(deleteFn).toHaveBeenCalledTimes(1);
+
+    panel.setProps({ data: mockedData });
+    expect(load).toHaveBeenCalledTimes(3);
   });
 
   it('passes options to the custom element upon initialization and when props change', () => {
