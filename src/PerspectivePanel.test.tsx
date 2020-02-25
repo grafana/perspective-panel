@@ -1,17 +1,13 @@
-import { PanelData } from '@grafana/data';
+import { PanelData, toDataFrame } from '@grafana/data';
 import { PerspectivePanel as PerspectivePanelOriginal } from './PerspectivePanel';
 import { shallow } from 'enzyme';
 import React from 'react';
-
-jest.mock('./transformers', () => ({
-  toPerspectiveData: input => input,
-}));
 
 jest.mock('@finos/perspective-viewer', () => {});
 jest.mock('@finos/perspective-viewer-d3fc', () => {});
 jest.mock('@finos/perspective-viewer-hypergrid', () => {});
 
-/*jest.mock('@grafana/runtime', () => ({
+jest.mock('@grafana/runtime', () => ({
   config: {
     theme: {
       get isDark() {
@@ -19,7 +15,7 @@ jest.mock('@finos/perspective-viewer-hypergrid', () => {});
       },
     },
   },
-}));*/
+}));
 
 class PerspectivePanel extends PerspectivePanelOriginal {
   componentDidMount() {
@@ -30,6 +26,7 @@ class PerspectivePanel extends PerspectivePanelOriginal {
 
 const mockedViewer = {
   addEventListener: jest.fn(),
+  delete: jest.fn().mockResolvedValue(true),
   load: jest.fn().mockResolvedValue(),
   notifyResize: jest.fn(),
   save: jest.fn().mockReturnValue({}),
@@ -41,12 +38,12 @@ const mockedWidth = 200;
 
 const mockedData: PanelData = {
   series: [
-    { name: 'AA', values: [0, 1, 2, 3] },
-    { name: 'BB', values: [4, 5, 6, 7] },
+    toDataFrame({ refId: 'AA', fields: [{ name: 'AA', values: [0, 1, 2, 3] }] }),
+    toDataFrame({ refId: 'BB', fields: [{ name: 'BB', values: [4, 5, 6, 7] }] }),
   ],
 };
 
-//let mockedIsDark;
+let mockedIsDark;
 
 const createPanel = config => {
   const { data, height, options, width } = {
@@ -62,8 +59,8 @@ const createPanel = config => {
 
 describe('PerspectivePanel', () => {
   beforeEach(() => {
-    Object.values(mockedViewer).forEach(method => method.mockReset());
-    //mockedIsDark = true;
+    Object.values(mockedViewer).forEach(method => method.mockClear());
+    mockedIsDark = true;
   });
 
   it('contains a custom element', () => {
@@ -71,28 +68,44 @@ describe('PerspectivePanel', () => {
     expect(viewers).toHaveLength(1);
   });
 
-  // @todo when possible: https://github.com/finos/perspective/issues/865
-  /*it('supports dark and light themes', () => {
+  it('supports a dark theme', () => {
     const wrapper = shallow(createPanel());
     const viewer = wrapper.find('perspective-viewer').first();
 
-    expect(viewer.hasClass('perspective-viewer-material-dense')).toBe(false);
-    expect(viewer.hasClass('perspective-viewer-material-dense-dark')).toBe(true);
+    // @todo use `hasClass` when possible: https://github.com/finos/perspective/issues/931
+    expect(viewer.matchesElement(<perspective-viewer class="perspective-viewer-material-dense" />)).toBe(false);
+    expect(viewer.matchesElement(<perspective-viewer class="perspective-viewer-material-dense-dark" />)).toBe(true);
+  });
 
+  it('supports a light theme', () => {
     mockedIsDark = false;
-    wrapper.update();
-    expect(viewer.hasClass('perspective-viewer-material-dense')).toBe(true);
-    expect(viewer.hasClass('perspective-viewer-material-dense-dark')).toBe(false);
-  });*/
+
+    const wrapper = shallow(createPanel());
+    const viewer = wrapper.find('perspective-viewer').first();
+
+    // @todo use `hasClass` when possible: https://github.com/finos/perspective/issues/931
+    expect(viewer.matchesElement(<perspective-viewer class="perspective-viewer-material-dense" />)).toBe(true);
+    expect(viewer.matchesElement(<perspective-viewer class="perspective-viewer-material-dense-dark" />)).toBe(false);
+  });
 
   it('passes data to the custom element upon initialization and when props change', () => {
-    const { load } = mockedViewer;
+    const { delete: deleteFn, load } = mockedViewer;
     const panel = shallow(createPanel());
 
     expect(load).toHaveBeenCalledTimes(1);
 
-    panel.setProps({ data: { series: [] } });
+    panel.setProps({
+      data: { ...mockedData } as PanelData,
+    });
     expect(load).toHaveBeenCalledTimes(2);
+
+    panel.setProps({
+      data: { series: [] } as PanelData,
+    });
+    expect(deleteFn).toHaveBeenCalledTimes(1);
+
+    panel.setProps({ data: mockedData });
+    expect(load).toHaveBeenCalledTimes(3);
   });
 
   it('passes options to the custom element upon initialization and when props change', () => {
