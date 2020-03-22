@@ -12,10 +12,10 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@finos/perspective-webpack-plugin": "0.4.1",
-    "@grafana/data": "canary",
-    "@grafana/runtime": "canary",
-    "@grafana/toolkit": "canary",
-    "@grafana/ui": "canary",
+    "@grafana/data": "next",
+    "@grafana/runtime": "next",
+    "@grafana/toolkit": "next",
+    "@grafana/ui": "next",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2"
   },
