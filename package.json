@@ -23,5 +23,8 @@
     "@finos/perspective-viewer": "0.4.3",
     "@finos/perspective-viewer-d3fc": "0.4.3",
     "@finos/perspective-viewer-hypergrid": "0.4.3"
+  },
+  "resolutions": {
+    "@babel/preset-env": "7.9.0"
   }
 }
