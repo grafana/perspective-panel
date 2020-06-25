@@ -1,5 +1,5 @@
 import { PanelPlugin } from '@grafana/data';
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import * as module from './module';
 
 jest.mock('./PerspectivePanel', () => class PerspectivePanel extends PureComponent {});

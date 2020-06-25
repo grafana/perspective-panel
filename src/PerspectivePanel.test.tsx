@@ -1,4 +1,4 @@
-import { PanelData, toDataFrame } from '@grafana/data';
+import { PanelData, toDataFrame, LoadingState } from '@grafana/data';
 import { PerspectivePanel as PerspectivePanelOriginal } from './PerspectivePanel';
 import { shallow } from 'enzyme';
 import React from 'react';
@@ -18,8 +18,8 @@ jest.mock('@grafana/runtime', () => ({
 }));
 
 class PerspectivePanel extends PerspectivePanelOriginal {
-  componentDidMount() {
-    this.viewer.current = mockedViewer;
+  async componentDidMount() {
+    (this.viewer as any).current = mockedViewer;
     super.componentDidMount();
   }
 }
@@ -27,34 +27,34 @@ class PerspectivePanel extends PerspectivePanelOriginal {
 const mockedViewer = {
   addEventListener: jest.fn(),
   delete: jest.fn().mockResolvedValue(true),
-  load: jest.fn().mockResolvedValue(),
+  load: jest.fn().mockResolvedValue({}),
   notifyResize: jest.fn(),
   save: jest.fn().mockReturnValue({}),
-  toggleConfig: jest.fn().mockResolvedValue(),
+  toggleConfig: jest.fn().mockResolvedValue(true),
 };
 
 const mockedHeight = 100;
 const mockedWidth = 200;
 
 const mockedData: PanelData = {
+  state: LoadingState.Done,
   series: [
     toDataFrame({ refId: 'AA', fields: [{ name: 'AA', values: [0, 1, 2, 3] }] }),
     toDataFrame({ refId: 'BB', fields: [{ name: 'BB', values: [4, 5, 6, 7] }] }),
   ],
-};
+} as PanelData;
 
-let mockedIsDark;
+let mockedIsDark = false;
 
-const createPanel = config => {
-  const { data, height, options, width } = {
-    data: mockedData,
-    height: mockedHeight,
-    options: {},
-    width: mockedWidth,
+const createPanel = (config?: any) => {
+  const props = {
+    options: {}, // default empty
     ...config,
+    data: mockedData,
+    width: mockedWidth,
+    height: mockedHeight,
   };
-
-  return <PerspectivePanel data={data} height={height} options={options} width={width} />;
+  return <PerspectivePanel {...props} />;
 };
 
 describe('PerspectivePanel', () => {
@@ -100,7 +100,7 @@ describe('PerspectivePanel', () => {
     expect(load).toHaveBeenCalledTimes(2);
 
     panel.setProps({
-      data: { series: [] } as PanelData,
+      data: ({ series: [] } as unknown) as PanelData,
     });
     expect(deleteFn).toHaveBeenCalledTimes(1);
 

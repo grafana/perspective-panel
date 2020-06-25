@@ -90,7 +90,11 @@ export class PerspectivePanel extends PureComponent<Props, State> {
         }}
       >
         {showNotice && (
-          <Alert onRemove={() => this.hideNotice()} severity="info" title="Only the first datum of the series is referenced for display." />
+          <Alert
+            onRemove={() => this.hideNotice()}
+            severity="info"
+            title="Only the first datum of the series is referenced for display."
+          />
         )}
 
         <perspective-viewer
